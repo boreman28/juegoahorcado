@@ -1,31 +1,155 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <title>Buscador de Informes</title>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego del Ahorcado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      body {
-        padding: 20px;
-      }
-      .result-card {
-        margin-bottom: 20px;
-      }
+        .letter-button {
+            width: 40px;
+            height: 40px;
+            margin: 2px;
+        }
+        #hangman-drawing {
+            width: 200px;
+            height: 250px;
+            border: 1px solid #000;
+        }
+        #word-display {
+            letter-spacing: 5px;
+            font-size: 24px;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1 class="mb-4">Buscador de Informes</h1>
-      <div class="form-group">
-        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
-      </div>
-      <button onclick="buscar()" class="btn btn-primary mr-2">Buscar</button>
-      <button onclick="limpiar()" class="btn btn-secondary">Limpiar</button>
-      <div id="results" class="mt-4"></div>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Juego del Ahorcado</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="hangman-drawing"></canvas>
+            </div>
+            <div class="col-md-6">
+                <p id="word-display" class="text-center mb-4"></p>
+                <p id="lives" class="text-center">Vidas restantes: <span id="lives-count">6</span></p>
+                <div id="letter-buttons" class="text-center"></div>
+                <div class="mt-4 text-center">
+                    <button id="new-game-btn" class="btn btn-primary">Nueva Partida</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <?!= include('Script'); ?>
-  </body>
+    <script>
+        const words = ['javascript', 'html', 'css', 'bootstrap', 'python', 'react', 'angular', 'vue'];
+        let selectedWord = '';
+        let guessedWord = [];
+        let lives = 6;
+        const letterButtons = document.getElementById('letter-buttons');
+        const wordDisplay = document.getElementById('word-display');
+        const livesDisplay = document.getElementById('lives-count');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const canvas = document.getElementById('hangman-drawing');
+        const ctx = canvas.getContext('2d');
+
+        function initGame() {
+            selectedWord = words[Math.floor(Math.random() * words.length)];
+            guessedWord = Array(selectedWord.length).fill('_');
+            lives = 6;
+            updateWordDisplay();
+            updateLivesDisplay();
+            createLetterButtons();
+            clearCanvas();
+        }
+
+        function createLetterButtons() {
+            letterButtons.innerHTML = '';
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i);
+                const button = document.createElement('button');
+                button.textContent = letter;
+                button.className = 'btn btn-outline-primary letter-button';
+                button.addEventListener('click', () => guessLetter(letter.toLowerCase()));
+                letterButtons.appendChild(button);
+            }
+        }
+
+        function guessLetter(letter) {
+            if (selectedWord.includes(letter)) {
+                for (let i = 0; i < selectedWord.length; i++) {
+                    if (selectedWord[i] === letter) {
+                        guessedWord[i] = letter;
+                    }
+                }
+                updateWordDisplay();
+            } else {
+                lives--;
+                updateLivesDisplay();
+                drawHangman();
+            }
+
+            event.target.disabled = true;
+
+            if (guessedWord.join('') === selectedWord) {
+                alert('¡Felicidades! Has ganado.');
+            } else if (lives === 0) {
+                alert(`¡Oh no! Has perdido. La palabra era: ${selectedWord}`);
+            }
+        }
+
+        function updateWordDisplay() {
+            wordDisplay.textContent = guessedWord.join(' ');
+        }
+
+        function updateLivesDisplay() {
+            livesDisplay.textContent = lives;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawHangman() {
+            ctx.beginPath();
+            switch(6 - lives) {
+                case 1:
+                    ctx.moveTo(50, 200);
+                    ctx.lineTo(150, 200);
+                    break;
+                case 2:
+                    ctx.moveTo(100, 200);
+                    ctx.lineTo(100, 50);
+                    break;
+                case 3:
+                    ctx.moveTo(100, 50);
+                    ctx.lineTo(150, 50);
+                    break;
+                case 4:
+                    ctx.moveTo(150, 50);
+                    ctx.lineTo(150, 75);
+                    break;
+                case 5:
+                    ctx.arc(150, 90, 15, 0, Math.PI * 2);
+                    break;
+                case 6:
+                    ctx.moveTo(150, 105);
+                    ctx.lineTo(150, 150);
+                    ctx.moveTo(150, 120);
+                    ctx.lineTo(130, 140);
+                    ctx.moveTo(150, 120);
+                    ctx.lineTo(170, 140);
+                    ctx.moveTo(150, 150);
+                    ctx.lineTo(130, 180);
+                    ctx.moveTo(150, 150);
+                    ctx.lineTo(170, 180);
+                    break;
+            }
+            ctx.stroke();
+        }
+
+        newGameBtn.addEventListener('click', initGame);
+
+        initGame();
+    </script>
+</body>
 </html>
