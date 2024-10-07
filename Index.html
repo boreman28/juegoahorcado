@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Buscador de Informes</title>
+    <style>
+      body {
+        padding: 20px;
+      }
+      .result-card {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mb-4">Buscador de Informes</h1>
+      <div class="form-group">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+      </div>
+      <button onclick="buscar()" class="btn btn-primary mr-2">Buscar</button>
+      <button onclick="limpiar()" class="btn btn-secondary">Limpiar</button>
+      <div id="results" class="mt-4"></div>
+    </div>
+
+    <?!= include('Script'); ?>
+  </body>
+</html>
